@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<package name="Originals">
+<!--
+    BITS    DESCRIPTION
+    ====    ===========
+    10-6    Layer 3:
+                00000 = Nothing
+                00001 = Lolo
+                00010 = Snakey
+                00011 = Gol
+                00100 = Leeper
+                00101 = Skull
+                00110 = Rocky
+                00111 = Alma
+                01000 = Medusa
+                01001 = Don Medusa
+                01010 = Heart
+                01011 = Heart + shot
+                01100 = Heart + hammer
+                01101 = Heart + bridge
+                01110 = Heart + switch arrow
+                01111 = Chest
+                10000 = Block
+                10001 = Arrow
+                10010 = Rock
+                10011 = Tree
+    5       Layer 2:
+                0 = Nothing
+                1 = Bridge
+    4-2     Layer 1:
+                000 = Brick
+                001 = Grass
+                010 = Water
+                011 = Sand
+                100 = Lava
+    1-0     Direction:
+                00 = Down
+                01 = Right
+                10 = Up
+                11 = Left
+-->
+    <level floor="1" room="1" width="11" height="11" last-room="false" exit-position="3">
+        480 480 480 480 480 480 000 480 480 4C0 4C0
+        480 4C0 4C0 480 280 000 000 480 480 4C0 4C0
+        000 4C0 4C0 480 480 480 000 480 480 480 4C0
+        000 000 4C0 4C0 480 480 000 480 480 480 4C0
+        040 000 000 000 480 480 000 480 480 4C0 2C0
+        000 000 000 000 000 000 080 000 480 000 000
+        000 4C0 4C0 000 000 000 000 000 000 000 000
+        4C0 4C0 4C0 4C0 000 000 000 4C0 4C0 000 000
+        4C0 4C0 4C0 4C0 000 000 000 4C0 4C0 4C0 000
+        480 4C0 4C0 480 3C0 000 000 000 4C0 4C0 000
+        480 480 480 480 480 480 000 000 000 000 000
+    </level>
+</package>

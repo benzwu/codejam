@@ -1,0 +1,26 @@
+l leftpupil lefteye
+l lefteye body
+l rightpupil righteye
+l righteye body
+l leftarm body
+l rightarm body
+l jaw beak
+l beak body
+l stomach body
+
+p body 0 0 0
+
+anim idle 1 1
+anim walk 10 20
+
+#walk
+keyframe 10
+g body
+r 0 1 0 0
+
+keyframe 15
+g body
+r 20 1 0 0
+
+keyframe 20
+r -20 1 0 0
