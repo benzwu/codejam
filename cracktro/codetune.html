@@ -1,0 +1,68 @@
+<html><body bgcolor="#000000" style="text-align:center">
+<canvas id="canvas" width="640" height="400"/>
+<script src="lib/webgl-utils.js"/></script>
+<script src="lib/J3DIMath.js"></script>
+<script>
+
+/*
+  Codetune cractro
+  jostein.topland@gmail.com
+*/
+
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext("2d");
+
+function chiptune()
+{
+    var sampleRate = 8000;
+    var buffer = audioContext.createBuffer(1, 60 * sampleRate, sampleRate);
+    var out = buffer.getChannelData(0);
+    for (var i = 0; i < buffer.length; i++) {
+        out[i] = (i * (i >> 5 | i >> 8)) >> (i >> 16);
+        out[i] = (out[i] % 256) / 256 * 2 - 1;
+    }
+    return buffer;
+}
+
+var audioContext = new AudioContext();
+
+var volume = audioContext.createGain();
+volume.gain.value = 0.05;
+volume.connect(audioContext.destination);
+
+var source = audioContext.createBufferSource();
+source.buffer = chiptune();
+source.loop = true;
+source.connect(volume);
+source.start();
+
+var x = canvas.width / 2;
+var y = canvas.height / 2;
+var image = ctx.createImageData(canvas.width, canvas.height);
+var sourceIdx = 0;
+function main()
+{
+    window.requestAnimationFrame(main);
+
+    var speed = 200;
+    for (var i = 0; i < speed; i++) {
+        var idx = 4 * ((canvas.width * y) + x);
+        image.data[idx]     = (image.data[idx] * 2 + 5) % 256;
+        image.data[idx + 1] = (image.data[idx] * 3 + 3) % 256;
+        image.data[idx + 2] = (image.data[idx] * 5 + 2) % 256;
+        image.data[idx + 3] = 255;
+
+        
+        var v = source.buffer.getChannelData(0)[sourceIdx % source.buffer.getChannelData(0).length];
+        x += Math.cos(v) < 0.877 ? 1 : -1;
+        y += Math.sin(v) < -0.1 ? 1 : -1;
+        x = Math.max(0, Math.min(canvas.width, x));
+        y = Math.max(0, Math.min(canvas.height, y));
+
+        sourceIdx++;
+    }
+    ctx.putImageData(image, 0, 0);
+}
+main(0);
+
+</script></body></html>
