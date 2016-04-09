@@ -27,7 +27,7 @@ function chiptune()
 var audioContext = new AudioContext();
 
 var volume = audioContext.createGain();
-volume.gain.value = 0.05;
+volume.gain.value = 0.1;
 volume.connect(audioContext.destination);
 
 var source = audioContext.createBufferSource();
