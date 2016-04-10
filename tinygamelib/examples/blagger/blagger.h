@@ -9,7 +9,6 @@ public:
     Blagger();
 
 private:
-    void setLevel(int level);
     TinyGameLibrary tgl;
 };
 

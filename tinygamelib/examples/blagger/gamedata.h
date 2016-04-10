@@ -1,7 +1,7 @@
 #ifndef GAMEDATA_H
 #define GAMEDATA_H
 
-#include <string>
+/*#include <string>
 #include "types.h"
 
 using namespace std;
@@ -69,6 +69,6 @@ typedef struct
         { "fall", "data/fall.wav" },
         { "jump", "data/jump.wav" }
     };
-} GameData;
+} GameData;*/
 
 #endif
