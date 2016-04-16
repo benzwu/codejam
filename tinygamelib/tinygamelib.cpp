@@ -5,7 +5,6 @@
 
 TinyGameLibrary::TinyGameLibrary()
 {
-    playerDirection = TGL_Direction::STOP;
     spriteSheet = NULL;
 }
 
@@ -49,6 +48,8 @@ void TinyGameLibrary::init(int width, int height, int scale)
 
 void TinyGameLibrary::readKeys()
 {
+    TGL_Object& player = levels.at(levelNum).layer1.at(playerId);
+
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
         if (event.type == SDL_KEYDOWN) {
@@ -58,28 +59,34 @@ void TinyGameLibrary::readKeys()
                     run = false;
                     break;
                 case SDLK_LEFT:
-                    playerDirection = TGL_Direction::LEFT;
+                    player.direction = TGL_Direction::LEFT;
+                    player.state = TGL_State::WALKING;
                     break;
                 case SDLK_RIGHT:
-                    playerDirection = TGL_Direction::RIGHT;
+                    player.direction = TGL_Direction::RIGHT;
+                    player.state = TGL_State::WALKING;
                     break;
                 case SDLK_UP:
-                    playerDirection = TGL_Direction::UP;
+                    player.direction = TGL_Direction::UP;
+                    player.state = TGL_State::WALKING;
                     break;
                 case SDLK_DOWN:
-                    playerDirection = TGL_Direction::DOWN;
+                    player.direction = TGL_Direction::DOWN;
+                    player.state = TGL_State::WALKING;
                     break;
             }
         }
-        if (event.type == SDL_KEYUP) playerDirection = TGL_Direction::STOP;
+        if (event.type == SDL_KEYUP) player.state = TGL_State::STOPPED;
     }
 }
 
-bool TinyGameLibrary::hitTest(TGL_Position& position, int deltaX, int deltaY)
+bool TinyGameLibrary::hitTest(TGL_Object& object, int deltaX, int deltaY)
 {
-    TGL_SpriteSheetCoord& coord = objects.at(position.objectId).spriteSheetCoord;
-    int x = (position.x + coord.width / 2) / tileWidth + deltaX;
-    int y = (position.y + coord.height / 2) / tileHeight + deltaY;
+    return false;
+
+    TGL_SpriteSheetCoord& coord = objectDefinitions.at(object.definitionId).spriteSheetCoord;
+    int x = (object.x + coord.width / 2) / tileWidth + deltaX;
+    int y = (object.y + coord.height / 2) / tileHeight + deltaY;
     
     int width = levels.at(levelNum).layer0.size();
     int height = levels.at(levelNum).layer0.at(0).size();
@@ -87,31 +94,39 @@ bool TinyGameLibrary::hitTest(TGL_Position& position, int deltaX, int deltaY)
     if (y < 0 || y >= height) return true;
 
     TGL_Id id = levels.at(levelNum).layer0.at(y).at(x);
-    TGL_ObjectType type = objects.at(id).type;
+    TGL_ObjectType type = objectDefinitions.at(id).type;
     return type == TGL_ObjectType::BLOCK;
 }
 
+#include <algorithm>
+#include <iostream>
+
 void TinyGameLibrary::moveObjects()
 {
-    int speed = 2;
+    int speed = 1;
 
-    if (playerRef != -1) {
-        TGL_Position& playerPosition = levels.at(levelNum).layer1.at(playerRef);
+    if (playerId != -1) {
+        TGL_Object& player = levels.at(levelNum).layer1.at(playerId);
+        TGL_SpriteSheetCoord& coord = objectDefinitions.at(player.definitionId).spriteSheetCoord;
 
-        if (playerDirection == TGL_Direction::LEFT && !hitTest(playerPosition, -1, 0)) playerPosition.x -= speed;
-        if (playerDirection == TGL_Direction::RIGHT && !hitTest(playerPosition, 1, 0)) playerPosition.x += speed;
-        if (playerDirection == TGL_Direction::UP && !hitTest(playerPosition, 0, -1)) playerPosition.y -= speed;
-        if (playerDirection == TGL_Direction::DOWN && !hitTest(playerPosition, 0, 1)) playerPosition.y += speed;
+        int x = (player.x + coord.width / 2 - tileWidth / 2) / tileWidth;
+
+        if (player.state == TGL_State::WALKING) {
+            if (player.direction == TGL_Direction::LEFT) x--;
+            if (player.direction == TGL_Direction::RIGHT) x++;
+        }
+
+        if (player.direction == TGL_Direction::LEFT) player.x = max(player.x - speed, x * tileWidth);
+        if (player.direction == TGL_Direction::RIGHT) player.x = min(player.x + speed, x * tileWidth);
     }
 }
 
 void TinyGameLibrary::mainLoop()
 {
     run = true;
-
     while (run) {
-        readKeys();
         SDL_RenderClear(renderer);
+        readKeys();
         moveObjects();
         drawLevel();
         SDL_RenderPresent(renderer);
@@ -121,8 +136,8 @@ void TinyGameLibrary::mainLoop()
 
 void TinyGameLibrary::drawSprite(TGL_Id id, int x, int y)
 {
-    TGL_Object& object = objects.at(id);
-    TGL_SpriteSheetCoord& coord = object.spriteSheetCoord;
+    TGL_ObjectDefinition& objectDefinition = objectDefinitions.at(id);
+    TGL_SpriteSheetCoord& coord = objectDefinition.spriteSheetCoord;
 
     SDL_Rect srcRect = { coord.x, coord.y, coord.width, coord.height };
     SDL_Rect dstRect = { x, y, coord.width, coord.height };
@@ -142,11 +157,11 @@ void TinyGameLibrary::setSpriteSheet(string filename)
     SDL_FreeSurface(temp);
 }
 
-void TinyGameLibrary::setObjects(vector<TGL_Object> objectList)
+void TinyGameLibrary::setObjectDefinitions(vector<TGL_ObjectDefinition> objectDefinitionList)
 {
-    for (auto& object : objectList) {
+    for (auto& object : objectDefinitionList) {
         TGL_Id id = object.id;
-        objects[id] = object;
+        objectDefinitions[id] = object;
     }
 }
 
@@ -172,22 +187,21 @@ void TinyGameLibrary::drawLevel()
     for (unsigned int i = 0; i < level.layer0.size(); i++) {
         for (unsigned int j = 0; j < level.layer0.at(i).size(); j++) {
             TGL_Id id = level.layer0.at(i).at(j);
-            int x = tileWidth * j;
-            int y = tileHeight * i;
+            int x = j * tileWidth;
+            int y = i * tileHeight;
 
             drawSprite(id, x, y);
         }
     }
 
     for (unsigned int i = 0; i < level.layer1.size(); i++) {
-        TGL_Position& position = level.layer1.at(i);
-        TGL_Id id = position.objectId;
+        TGL_Object& object = level.layer1.at(i);
 
-        drawSprite(id, position.x, position.y);
+        drawSprite(object.definitionId, object.x, object.y);
     }
 }
 
-void TinyGameLibrary::setLevels(vector<TGL_Level> levelList, int tw, int th)
+void TinyGameLibrary::setLevels(const vector<TGL_Level>& levelList, int tw, int th)
 {
     levels = levelList;
     tileWidth = tw;
@@ -196,14 +210,14 @@ void TinyGameLibrary::setLevels(vector<TGL_Level> levelList, int tw, int th)
     for (unsigned int i = 0; i < levels.size(); i++) {
         TGL_Level& level = levels.at(i);
         for (unsigned int j = 0; j < level.layer1.size(); j++) {
-            TGL_Position& position = level.layer1.at(j);
-            TGL_Id id = position.objectId;
-            TGL_SpriteSheetCoord& coord = objects.at(id).spriteSheetCoord;
-            int x = tileWidth * position.x - coord.width / 2 + tileWidth / 2;
-            int y = tileHeight * position.y - coord.height / 2 + tileHeight / 2;
+            TGL_Object& object = level.layer1.at(j);
+            TGL_Id id = object.definitionId;
+            TGL_SpriteSheetCoord& coord = objectDefinitions.at(id).spriteSheetCoord;
+            int x = object.x * tileWidth + tileWidth / 2 - coord.width / 2;
+            int y = object.y * tileHeight + tileHeight / 2 - coord.height / 2;
 
-            position.x = x;
-            position.y = y;
+            object.x = x;
+            object.y = y;
         }
     }
 
@@ -213,15 +227,15 @@ void TinyGameLibrary::setLevels(vector<TGL_Level> levelList, int tw, int th)
 void TinyGameLibrary::setLevel(int num)
 {
     levelNum = num;
-    playerRef = -1;
+    playerId = -1;
 
     TGL_Level& level = levels.at(levelNum);
     for (unsigned int i = 0; i < level.layer1.size(); i++) {
-        TGL_Position& position = level.layer1.at(i);
-        TGL_Object& object = objects.at(position.objectId);
+        TGL_Id id = level.layer1.at(i).definitionId;
+        TGL_ObjectDefinition& objDef = objectDefinitions.at(id);
         
-        if (object.type == TGL_ObjectType::PLAYER) {
-            playerRef = i;
+        if (objDef.type == TGL_ObjectType::PLAYER) {
+            playerId = i;
             break;
         }
     }

@@ -22,11 +22,15 @@ enum class TGL_ObjectType {
 };
 
 enum class TGL_Direction {
-    STOP,
-    LEFT,
-    RIGHT,
+    DOWN,
     UP,
-    DOWN
+    LEFT,
+    RIGHT  
+};
+
+enum class TGL_State {
+    STOPPED,
+    WALKING
 };
 
 typedef struct {
@@ -43,18 +47,20 @@ typedef struct {
     string name;
     TGL_SpriteSheetCoord spriteSheetCoord;
     TGL_ObjectType type;
-} TGL_Object;
+} TGL_ObjectDefinition;
 
 typedef struct {
-    TGL_Id objectId;
+    TGL_Id definitionId;
     int x;
     int y;
-} TGL_Position;
+    TGL_Direction direction;
+    TGL_State state;
+} TGL_Object;
 
 typedef struct {
     string name;
     vector<vector<TGL_Id>> layer0;
-    vector<TGL_Position> layer1;
+    vector<TGL_Object> layer1;
 } TGL_Level;
 
 typedef struct {
@@ -72,8 +78,8 @@ public:
     void mainLoop();
     
     void setLevel(int num);
-    void setLevels(vector<TGL_Level> levels, int tileWidth, int tileHeight);
-    void setObjects(vector<TGL_Object> objects);
+    void setLevels(const vector<TGL_Level>& levels, int tileWidth, int tileHeight);
+    void setObjectDefinitions(vector<TGL_ObjectDefinition> objectDefinitions);
     void setSpriteSheet(string filename);
 
     TGL_Sound loadSound(string filename, int channel = 0);
@@ -84,22 +90,21 @@ private:
     void drawSprite(TGL_Id id, int x, int y);
     void moveObjects();
     void readKeys();
-    bool hitTest(TGL_Position& position, int deltaX, int deltaY);
+    bool hitTest(TGL_Object& object, int deltaX, int deltaY);
 
     SDL_Renderer* renderer;
     SDL_Window* window;
     SDL_Texture* spriteSheet;
     
     bool run;
-    map<TGL_Id, TGL_Object> objects;
+    map<TGL_Id, TGL_ObjectDefinition> objectDefinitions;
 
     int tileWidth;
     int tileHeight;
     int levelNum;
     vector<TGL_Level> levels;
 
-    int playerRef;
-    TGL_Direction playerDirection;
+    TGL_Id playerId;
 };
 
 #endif

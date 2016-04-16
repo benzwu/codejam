@@ -2,14 +2,14 @@
 
 Jumpinjackson::Jumpinjackson()
 {
-    int width = 640;
-    int height = 480;
-    int scale = 2;
+    int width = 320;
+    int height = 200;
+    int scale = 4;
     tgl.init(width, height, scale);
 
     tgl.setSpriteSheet("data/spritesheet.bmp");
 
-    vector<TGL_Object> objects = {
+    vector<TGL_ObjectDefinition> objectDefinitions = {
         { 0, "Water",{ 0, 216, 32, 24, 0, 1 }, TGL_ObjectType::BLOCK },
         { 1, "Gray floor",{ 0, 120, 32, 24, 0, 1 } },
         { 2, "Pink switch",{ 0, 192, 32, 24, 0, 1 } },
@@ -19,10 +19,10 @@ Jumpinjackson::Jumpinjackson()
         { 6, "Gray note floor",{ 0, 168, 32, 24, 0, 1 } },
         { 7, "Yellow turntable, stopped",{ 0, 96, 32, 24, 0, 1 } },
         { 8, "Pink turntable, stopped",{ 0, 48, 32, 24, 0, 1 } },
-        { 9, "Jack",{ 0, 248, 56, 40, 0, 8 }, TGL_ObjectType::PLAYER },
+        { 9, "Jack",{ 0, 192, 32, 24, 0, 1 }, TGL_ObjectType::PLAYER },
         { 10, "Cymbal",{ 160, 0, 32, 24, 0, 5 }, TGL_ObjectType::ENEMY }
     };
-    tgl.setObjects(objects);
+    tgl.setObjectDefinitions(objectDefinitions);
 
     int tileWidth = 32;
     int tileHeight = 24;
@@ -64,7 +64,7 @@ Jumpinjackson::Jumpinjackson()
     tgl.mainLoop();
 }
 
-int main(int, char **)
+int main(int, char**)
 {
     Jumpinjackson();
     return 0;
