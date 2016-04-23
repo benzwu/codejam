@@ -1,0 +1,117 @@
+<html><body bgcolor="#000000" style="text-align:center">
+<canvas id="canvas" width="800" height="400"/>
+<script src="lib/webgl-utils.js"/></script>
+<script src="lib/J3DIMath.js"></script>
+<script src="lib/player.js"></script>
+<script src="lib/pt.js"></script>
+<script>
+
+/*
+    River Raid
+    jostein.topland@gmail.com
+*/
+
+var modPlayer = new Modplayer();
+modPlayer.load("mod/oriental_blaster.mod");
+modPlayer.setrepeat(true);
+modPlayer.setautostart(true);
+
+// init
+var canvas = document.getElementById("canvas");
+var gl = canvas.getContext("webgl");
+gl.clearColor(0.4, 0.4, 1.0, 1);
+gl.enable(gl.DEPTH_TEST);
+
+// shaders
+var vertexShader = " \
+    attribute vec3 aPosition; \
+    uniform mat4 uMvp; \
+    uniform float uPointSize; \
+    varying vec3 vColor; \
+    void main() { \
+      gl_Position = uMvp * vec4(aPosition, 1.0); \
+      vColor = vec3(0, sin(8.0 * aPosition.z), 0.5 - sin(10.0 * aPosition.z)); \
+      gl_PointSize = uPointSize; \
+    }";
+var fragmentShader = " \
+    precision mediump float; \
+    varying vec3 vColor; \
+    void main() { \
+      gl_FragColor = vec4(vColor, 1); \
+    }";
+var program = createProgram(vertexShader, fragmentShader);
+gl.useProgram(program);
+
+// shader pointers
+var mvpLocation = gl.getUniformLocation(program, "uMvp");
+var pointSizeLocation = gl.getUniformLocation(program, "uPointSize");
+var positionLocation = gl.getAttribLocation(program, "aPosition");
+gl.enableVertexAttribArray(positionLocation);
+
+var landscapeNumPoints = 4096;
+var landscapeBuffer = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, landscapeBuffer);
+gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(3 * landscapeNumPoints), gl.DYNAMIC_DRAW);
+
+function lcg(seed) {
+    return (seed * 1103515245 + 12345) % 0x80000000 / 0x80000000;
+}
+var r = 0;
+function render() {
+    var time = new Date().getTime();
+
+    var v1 = modPlayer.chvu[0];
+    var v2 = modPlayer.chvu[1];
+    var v3 = modPlayer.chvu[2];
+    var v4 = modPlayer.chvu[3];
+
+    gl.clearColor(0.4-v1, 0.4, 1.0, 1);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+    gl.uniform1f(pointSizeLocation, 20*v1);
+
+    var view = new J3DIMatrix4();
+    view.makeIdentity();
+    view.translate(0, 0, -0.6);
+    view.rotate(-60, 1, 0, 0);
+    view.rotate(20*Math.sin(time/1000), 0, 1, 0);
+
+    var model = new J3DIMatrix4();
+    model.makeIdentity();
+
+    var projection = new J3DIMatrix4();
+    projection.perspective(80, canvas.width / canvas.height, 0.1, 1000);
+
+    var mvp = new J3DIMatrix4();
+    mvp.makeIdentity();
+    mvp.multiply(projection);
+    mvp.multiply(view);
+    mvp.multiply(model);
+    gl.uniformMatrix4fv(mvpLocation, false, mvp.getAsFloat32Array());
+
+    // landscape
+    var landscapeVertices = [];
+    for (var i = 0; i < landscapeNumPoints; i++) {
+        var rows = Math.sqrt(landscapeNumPoints);
+        var offset = 0.5 - 1 / (2 * rows);
+        var width = landscapeNumPoints / rows;
+        var x = 2.0 * (i % width / width - offset);
+        var y = 2.0 * (Math.floor(i / width) / rows - offset);
+        var z = 0.02 * Math.sin(y * 5.0 * Math.PI + time / 100) - 0.1 * Math.cos(x * 2 * Math.PI);
+        landscapeVertices[3 * i] = x;
+        landscapeVertices[3 * i + 1] = y;
+        landscapeVertices[3 * i + 2] = z;
+    }
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, landscapeBuffer);
+    gl.bufferSubData(gl.ARRAY_BUFFER, 0, new Float32Array(landscapeVertices));
+    gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 0, 0);
+    gl.drawArrays(gl.POINTS, 0, landscapeVertices.length / 3);
+
+    var fps = 30;
+    time = 1000 / fps - (new Date().getTime() - time);
+    setTimeout(render, time);
+}
+render();
+
+</script></body></html>
