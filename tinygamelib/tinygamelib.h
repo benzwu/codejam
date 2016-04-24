@@ -53,6 +53,8 @@ typedef struct {
     TGL_Id definitionId;
     int x;
     int y;
+    int xTo;
+    int yTo;
     TGL_Direction direction;
     TGL_State state;
 } TGL_Object;
@@ -86,8 +88,8 @@ public:
     void playSound(TGL_Sound& sound);
 
 private:
-    void drawLevel();
-    void drawSprite(TGL_Id id, int x, int y);
+    void renderLevel();
+    void renderSprite(TGL_Id id, int x, int y);
     void moveObjects();
     void readKeys();
     bool hitTest(TGL_Object& object, int deltaX, int deltaY);
