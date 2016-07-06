@@ -29,8 +29,9 @@ enum class TGL_Direction {
 };
 
 enum class TGL_State {
-    STOPPED,
-    WALKING
+    IDLE,
+    WALK,
+    JUMP
 };
 
 typedef struct {
@@ -38,8 +39,7 @@ typedef struct {
     int y;
     int width;
     int height;
-    int frame;
-    int totalFrames;
+    int frames;
 } TGL_SpriteSheetCoord;
 
 typedef struct {
@@ -53,8 +53,6 @@ typedef struct {
     TGL_Id definitionId;
     int x;
     int y;
-    int xTo;
-    int yTo;
     TGL_Direction direction;
     TGL_State state;
 } TGL_Object;
