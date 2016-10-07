@@ -1,7 +1,15 @@
 #ifndef TINYGAMELIB_H
 #define TINYGAMELIB_H
 
-#include <map>
+#define DllExport __declspec(dllexport)
+
+class DllExport TinyGameLibrary
+{
+public:
+	TinyGameLibrary();
+};
+
+/*#include <map>
 #include <string>
 #include <vector>
 
@@ -105,6 +113,6 @@ private:
     vector<TGL_Level> levels;
 
     TGL_Id playerId;
-};
+};*/
 
 #endif

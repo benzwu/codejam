@@ -1,6 +1,10 @@
 #include "tinygamelib.h"
 
-#include <SDL.h>
+TinyGameLibrary::TinyGameLibrary()
+{
+}
+
+/*#include <SDL.h>
 #include <SDL_mixer.h>
 #include <algorithm>
 
@@ -11,10 +15,10 @@ TinyGameLibrary::TinyGameLibrary()
 
 TinyGameLibrary::~TinyGameLibrary()
 {
-    /*for (auto& it : this->sounds) {
-        Mix_Chunk* sampleB = it.second;
-        Mix_FreeChunk(sample);
-    }*/
+    //for (auto& it : this->sounds) {
+    //    Mix_Chunk* sampleB = it.second;
+    //    Mix_FreeChunk(sample);
+    //}
     
     SDL_DestroyTexture(spriteSheet);
     SDL_DestroyRenderer(renderer);
@@ -38,10 +42,10 @@ void TinyGameLibrary::init(int width, int height, int scale)
         exit(1);
     }
 
-    /*if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 1, 1024)) {
-        fprintf(stderr, "Unable to initialize SDL audio: %s\n", SDL_GetError());
-        exit(1);
-    }*/
+    //if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 1, 1024)) {
+    //  fprintf(stderr, "Unable to initialize SDL audio: %s\n", SDL_GetError());
+    //  exit(1);
+    //}
 
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderSetScale(renderer, (float)scale, (float)scale);
@@ -251,4 +255,4 @@ void TinyGameLibrary::setLevel(int num)
             break;
         }
     }
-}
+}*/
