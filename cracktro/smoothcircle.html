@@ -1,0 +1,38 @@
+<html><body>
+Smooth circle:<br>
+<canvas id="canvas" width="1000" height="1000"/>
+<script>
+
+var canvas = document.getElementById("canvas");
+var context = canvas.getContext('2d');
+
+var c = 0;
+setInterval(function() {
+    context.fillStyle = 'gray';
+    context.fillRect(0, 0, 400, 400);
+    context.lineWidth = 2.5;
+    context.save();
+    context.translate(200, 200);
+    for (var j = 0; j < 4; j++) {
+        var n = 16 * j + 20;
+        for (var i = 0; i < n; i++) {
+            var s = 10;
+            var a = i * 2 * Math.PI / n;
+            var r = 40 * j + 50;
+            var x = r * Math.cos(a);
+            var y = r * Math.sin(a);
+            context.save();
+            context.translate(x - s / 2, y - s / 2);
+            context.translate(s / 2, s / 2);
+            context.rotate(a - Math.sin(c * 0.01) * 0.3 * ((j % 2) ? 1 : -1));
+            context.translate(-s / 2, -s / 2);
+            context.strokeStyle = (j == 2 && c % n == i) ? 'red' : (i % 2) ? 'white' : 'black';
+            context.strokeRect(0, 0, s, s);
+            context.restore();
+        }
+    }
+    c++;
+    context.restore();
+}, 1000 / 20);
+
+</script></body></html>
