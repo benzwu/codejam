@@ -3,13 +3,7 @@
 
 #define DllExport __declspec(dllexport)
 
-class DllExport TinyGameLibrary
-{
-public:
-	TinyGameLibrary();
-};
-
-/*#include <map>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -23,10 +17,11 @@ struct SDL_Window;
 typedef int TGL_Id;
 
 enum class TGL_ObjectType {
-    FLOOR,
-    BLOCK,
-    PLAYER,
-    ENEMY
+    Floor,
+    Block,
+    Player,
+    Enemy,
+    Background
 };
 
 enum class TGL_Direction {
@@ -52,7 +47,7 @@ typedef struct {
 
 typedef struct {
     TGL_Id id;
-    string name;
+    //string name;
     TGL_SpriteSheetCoord spriteSheetCoord;
     TGL_ObjectType type;
 } TGL_ObjectDefinition;
@@ -67,8 +62,8 @@ typedef struct {
 
 typedef struct {
     string name;
-    vector<vector<TGL_Id>> layer0;
-    vector<TGL_Object> layer1;
+    vector<vector<TGL_Id>> layer0; // background
+    vector<TGL_Object> layer1; // sprites
 } TGL_Level;
 
 typedef struct {
@@ -80,39 +75,37 @@ typedef struct {
 class TinyGameLibrary
 {
 public:
-    TinyGameLibrary();
-    ~TinyGameLibrary();
-    void init(int width, int height, int scale = 1);
-    void mainLoop();
+    DllExport TinyGameLibrary(int width, int height, int scale);
+    DllExport ~TinyGameLibrary();
+    DllExport void mainLoop();
     
-    void setLevel(int num);
-    void setLevels(const vector<TGL_Level>& levels, int tileWidth, int tileHeight);
-    void setObjectDefinitions(vector<TGL_ObjectDefinition> objectDefinitions);
-    void setSpriteSheet(string filename);
-
-    TGL_Sound loadSound(string filename, int channel = 0);
-    void playSound(TGL_Sound& sound);
+    void setLevel(int levelAt);
+    DllExport void setLevels(const vector<TGL_Level>& levels, int tileWidth, int tileHeight);
+    DllExport void loadSpriteSheet(const string& filename, const vector<TGL_ObjectDefinition>& spriteDefinitions);
+    DllExport void loadSound(TGL_Id id, const string& filename, int channel = 0);
+    DllExport void playSound(TGL_Id id);
 
 private:
     void renderLevel();
-    void renderSprite(TGL_Id id, int x, int y);
     void moveObjects();
     void readKeys();
-    bool hitTest(TGL_Object& object, int deltaX, int deltaY);
+    void renderSprite(TGL_Id id, int x, int y);
+    //bool hitTest(TGL_Object& object, int deltaX, int deltaY);
 
-    SDL_Renderer* renderer;
-    SDL_Window* window;
-    SDL_Texture* spriteSheet;
+    SDL_Renderer* m_renderer;
+    SDL_Window* m_window;
+    SDL_Texture* m_spriteSheet;
     
-    bool run;
-    map<TGL_Id, TGL_ObjectDefinition> objectDefinitions;
+    bool m_run;
+    map<TGL_Id, TGL_Sound> m_sounds;
+    map<TGL_Id, TGL_ObjectDefinition> m_objectDefinitions;
 
-    int tileWidth;
-    int tileHeight;
-    int levelNum;
-    vector<TGL_Level> levels;
+    int m_tileWidth;
+    int m_tileHeight;
+    unsigned int m_levelAt;
+    vector<TGL_Level> m_levels;
 
-    TGL_Id playerId;
-};*/
+    TGL_Object* m_player;
+};
 
 #endif
