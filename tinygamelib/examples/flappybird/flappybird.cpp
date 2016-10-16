@@ -4,7 +4,7 @@
 
 FlappyBird::FlappyBird()
 {
-    TinyGameLibrary tgl(320, 200, 5);
+    TinyGameLibrary tgl(320, 200, 3);
 
     enum Object : TGL_Id { Bird, Background };
     vector<TGL_ObjectDefinition> spriteDefinitions = {

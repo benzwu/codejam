@@ -2,4 +2,6 @@
 *.sdf
 *.opensdf
 Debug
+Release
 .vs
+*.VC.db
