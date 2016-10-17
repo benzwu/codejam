@@ -1,0 +1,76 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tinygamelib", "tinygamelib\tinygamelib.vcxproj", "{6797A67C-2D39-496E-9759-094435014459}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{60EF4A19-CCBC-4DB7-9E68-1931D25D3CA1}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "blagger", "examples\blagger\blagger.vcxproj", "{D3CAA185-D3C2-4BA2-BC2F-485758E47EDE}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6797A67C-2D39-496E-9759-094435014459} = {6797A67C-2D39-496E-9759-094435014459}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "flappybird", "examples\flappybird\flappybird.vcxproj", "{DCD5849D-D4AE-4100-B42E-5381BC94BC15}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6797A67C-2D39-496E-9759-094435014459} = {6797A67C-2D39-496E-9759-094435014459}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "jumpinjackson", "examples\jumpinjackson\jumpinjackson.vcxproj", "{E9B42036-CC42-4D5C-AB78-D24E9CB23E3A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6797A67C-2D39-496E-9759-094435014459} = {6797A67C-2D39-496E-9759-094435014459}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lolo3d", "examples\lolo3d\lolo3d.vcxproj", "{3365C49F-6571-41EA-BB3C-6263D70A33C0}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6797A67C-2D39-496E-9759-094435014459} = {6797A67C-2D39-496E-9759-094435014459}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vampire", "examples\vampire\vampire.vcxproj", "{F444F65D-F07E-4EE7-96C7-44BC0FFFB2F4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6797A67C-2D39-496E-9759-094435014459} = {6797A67C-2D39-496E-9759-094435014459}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6797A67C-2D39-496E-9759-094435014459}.Debug|x86.ActiveCfg = Debug|Win32
+		{6797A67C-2D39-496E-9759-094435014459}.Debug|x86.Build.0 = Debug|Win32
+		{6797A67C-2D39-496E-9759-094435014459}.Release|x86.ActiveCfg = Release|Win32
+		{6797A67C-2D39-496E-9759-094435014459}.Release|x86.Build.0 = Release|Win32
+		{D3CAA185-D3C2-4BA2-BC2F-485758E47EDE}.Debug|x86.ActiveCfg = Debug|Win32
+		{D3CAA185-D3C2-4BA2-BC2F-485758E47EDE}.Debug|x86.Build.0 = Debug|Win32
+		{D3CAA185-D3C2-4BA2-BC2F-485758E47EDE}.Release|x86.ActiveCfg = Release|Win32
+		{D3CAA185-D3C2-4BA2-BC2F-485758E47EDE}.Release|x86.Build.0 = Release|Win32
+		{DCD5849D-D4AE-4100-B42E-5381BC94BC15}.Debug|x86.ActiveCfg = Debug|Win32
+		{DCD5849D-D4AE-4100-B42E-5381BC94BC15}.Debug|x86.Build.0 = Debug|Win32
+		{DCD5849D-D4AE-4100-B42E-5381BC94BC15}.Release|x86.ActiveCfg = Release|Win32
+		{DCD5849D-D4AE-4100-B42E-5381BC94BC15}.Release|x86.Build.0 = Release|Win32
+		{E9B42036-CC42-4D5C-AB78-D24E9CB23E3A}.Debug|x86.ActiveCfg = Debug|Win32
+		{E9B42036-CC42-4D5C-AB78-D24E9CB23E3A}.Debug|x86.Build.0 = Debug|Win32
+		{E9B42036-CC42-4D5C-AB78-D24E9CB23E3A}.Release|x86.ActiveCfg = Release|Win32
+		{E9B42036-CC42-4D5C-AB78-D24E9CB23E3A}.Release|x86.Build.0 = Release|Win32
+		{3365C49F-6571-41EA-BB3C-6263D70A33C0}.Debug|x86.ActiveCfg = Debug|Win32
+		{3365C49F-6571-41EA-BB3C-6263D70A33C0}.Debug|x86.Build.0 = Debug|Win32
+		{3365C49F-6571-41EA-BB3C-6263D70A33C0}.Release|x86.ActiveCfg = Release|Win32
+		{3365C49F-6571-41EA-BB3C-6263D70A33C0}.Release|x86.Build.0 = Release|Win32
+		{F444F65D-F07E-4EE7-96C7-44BC0FFFB2F4}.Debug|x86.ActiveCfg = Debug|Win32
+		{F444F65D-F07E-4EE7-96C7-44BC0FFFB2F4}.Debug|x86.Build.0 = Debug|Win32
+		{F444F65D-F07E-4EE7-96C7-44BC0FFFB2F4}.Release|x86.ActiveCfg = Release|Win32
+		{F444F65D-F07E-4EE7-96C7-44BC0FFFB2F4}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{D3CAA185-D3C2-4BA2-BC2F-485758E47EDE} = {60EF4A19-CCBC-4DB7-9E68-1931D25D3CA1}
+		{DCD5849D-D4AE-4100-B42E-5381BC94BC15} = {60EF4A19-CCBC-4DB7-9E68-1931D25D3CA1}
+		{E9B42036-CC42-4D5C-AB78-D24E9CB23E3A} = {60EF4A19-CCBC-4DB7-9E68-1931D25D3CA1}
+		{3365C49F-6571-41EA-BB3C-6263D70A33C0} = {60EF4A19-CCBC-4DB7-9E68-1931D25D3CA1}
+		{F444F65D-F07E-4EE7-96C7-44BC0FFFB2F4} = {60EF4A19-CCBC-4DB7-9E68-1931D25D3CA1}
+	EndGlobalSection
+EndGlobal

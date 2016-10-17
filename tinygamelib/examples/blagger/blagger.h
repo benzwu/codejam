@@ -7,9 +7,6 @@ class Blagger
 {
 public:
     Blagger();
-
-private:
-    TinyGameLibrary tgl;
 };
 
 #endif

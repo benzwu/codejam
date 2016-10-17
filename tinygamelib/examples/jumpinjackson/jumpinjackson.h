@@ -7,9 +7,6 @@ class Jumpinjackson
 {
 public:
     Jumpinjackson();
-
-private:
-    TinyGameLibrary tgl;
 };
 
 #endif

@@ -1,7 +1,4 @@
-*.filters
-*.sdf
-*.opensdf
-Debug
-Release
 .vs
-*.VC.db
+*.sdf
+tinygamelib/VisualCpp/**/Debug
+tinygamelib/VisualCpp/examples/*/data
