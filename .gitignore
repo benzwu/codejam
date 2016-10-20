@@ -2,3 +2,4 @@
 *.sdf
 tinygamelib/VisualCpp/**/Debug
 tinygamelib/VisualCpp/examples/*/data
+*.vcxproj.user

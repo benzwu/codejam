@@ -90,7 +90,7 @@ private:
     void moveObjects();
     void readKeys();
     void renderSprite(TGL_Id id, int x, int y);
-    //bool hitTest(TGL_Object& object, int deltaX, int deltaY);
+    bool hitTest(TGL_Object& object, int deltaX, int deltaY);
 
     SDL_Renderer* m_renderer;
     SDL_Window* m_window;
@@ -100,6 +100,8 @@ private:
     map<TGL_Id, TGL_Sound> m_sounds;
     map<TGL_Id, TGL_ObjectDefinition> m_objectDefinitions;
 
+    int m_renderWidth;
+    int m_renderHeight;
     int m_tileWidth;
     int m_tileHeight;
     unsigned int m_levelAt;

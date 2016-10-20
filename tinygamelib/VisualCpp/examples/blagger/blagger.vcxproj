@@ -64,7 +64,7 @@
       <AdditionalDependencies>tinygamelib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y $(SolutionDir)..\examples\blagger\data data\ &gt;nul</Command>
+      <Command>xcopy /y $(SolutionDir)..\examples\$(ProjectName)\data data\ &gt;nul</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -87,7 +87,7 @@
       <AdditionalDependencies>tinygamelib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y $(SolutionDir)..\examples\blagger\data data\ &gt;nul</Command>
+      <Command>xcopy /y $(SolutionDir)..\examples\$(ProjectName)\data data\ &gt;nul</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
