@@ -25,10 +25,10 @@ enum class TGL_ObjectType {
 };
 
 enum class TGL_Direction {
-    DOWN,
-    UP,
     LEFT,
-    RIGHT  
+    RIGHT,
+    UP,
+    DOWN
 };
 
 enum class TGL_State {
@@ -63,7 +63,7 @@ typedef struct {
 typedef struct {
     string name;
     vector<vector<TGL_Id>> layer0; // background
-    vector<TGL_Object> layer1; // sprites
+    vector<TGL_Object> sprites; // sprites
 } TGL_Level;
 
 typedef struct {
@@ -90,7 +90,7 @@ private:
     void moveObjects();
     void readKeys();
     void renderSprite(TGL_Id id, int x, int y);
-    bool hitTest(TGL_Object& object, int deltaX, int deltaY);
+    bool hitTest(const TGL_Object& objectA, const TGL_Object& objectB);
 
     SDL_Renderer* m_renderer;
     SDL_Window* m_window;

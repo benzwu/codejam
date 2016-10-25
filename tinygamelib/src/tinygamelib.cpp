@@ -64,52 +64,42 @@ void TinyGameLibrary::readKeys()
                 case ::SDLK_ESCAPE:
                     m_run = false;
                     break;
-                /*case SDLK_LEFT:
-                    player.direction = TGL_Direction::LEFT;
-                    player.state = TGL_State::WALKING;
+                case SDLK_LEFT:
+                    m_player->direction = TGL_Direction::LEFT;
+                    m_player->state = TGL_State::WALK;
                     break;
                 case SDLK_RIGHT:
-                    player.direction = TGL_Direction::RIGHT;
-                    player.state = TGL_State::WALKING;
+                    m_player->direction = TGL_Direction::RIGHT;
+                    m_player->state = TGL_State::WALK;
                     break;
                 case SDLK_UP:
-                    player.direction = TGL_Direction::UP;
-                    player.state = TGL_State::WALKING;
+                    m_player->direction = TGL_Direction::UP;
+                    m_player->state = TGL_State::WALK;
                     break;
                 case SDLK_DOWN:
-                    player.direction = TGL_Direction::DOWN;
-                    player.state = TGL_State::WALKING;
-                    break;*/
+                    m_player->direction = TGL_Direction::DOWN;
+                    m_player->state = TGL_State::WALK;
+                    break;
             }
         }
-        //if (event.type == SDL_KEYUP) player.state = TGL_State::STOPPED;
+        if (event.type == SDL_KEYUP) m_player->state = TGL_State::IDLE;
     }
 }
 
 
-bool TinyGameLibrary::hitTest(TGL_Object& object, int deltaX, int deltaY)
+bool TinyGameLibrary::hitTest(const TGL_Object& objectA, const TGL_Object& objectB)
 {
+    float aLeft = (float) objectA.x / m_tileWidth;
+    float aRight = aLeft + (float) m_objectDefinitions.at(objectA.definitionId).spriteSheetCoord.width / m_tileWidth;
+    float aTop = (float) objectA.y / m_tileHeight;
+    float aBottom = aTop + (float) m_objectDefinitions.at(objectA.definitionId).spriteSheetCoord.height / m_tileHeight;
 
-    return false;
-    /*if (deltaX == 0 && deltaY == 0) return true;
+    float bLeft = (float)objectB.x / m_tileWidth;
+    float bRight = bLeft + (float)m_objectDefinitions.at(objectB.definitionId).spriteSheetCoord.width / m_tileWidth;
+    float bTop = (float)objectB.y / m_tileHeight;
+    float bBottom = bTop + (float)m_objectDefinitions.at(objectB.definitionId).spriteSheetCoord.height / m_tileHeight;
 
-    TGL_SpriteSheetCoord& coord = objectDefinitions.at(object.definitionId).spriteSheetCoord;
-    int x = object.x + deltaX;
-    int y = object.y + deltaY;
-    
-    int width = levels.at(levelNum).layer0.size() * tileWidth;
-    int height = levels.at(levelNum).layer0.at(0).size() * tileHeight;
-    if (x < 0 || x + coord.width > width) return true;
-    if (y < 0 || y + coord.height > height) return true;
-
-    return false;
-    float x2 = (float)(object.x + coord.width / 2) / tileWidth;
-    float y2 = (float)(object.y + coord.height / 2) / tileHeight;
-    if (deltaX != 0) x2 = (deltaX < 0) ? floor(x2 - 1) : ceil(x2 - 0); else x2 = floor(x2);
-    if (deltaY != 0) y2 = (deltaY < 0) ? floor(y2 - 1) : ceil(y2 - 0); else y2 = floor(y2);
-    TGL_Id id = levels.at(levelNum).layer0.at((int)y2).at((int)x2);
-    TGL_ObjectType type = objectDefinitions.at(id).type;
-    return type == TGL_ObjectType::BLOCK;*/
+    return aLeft <= bRight && bLeft <= aRight && aTop <= bBottom && bTop <= aBottom;
 }
 
 void TinyGameLibrary::moveObjects()
@@ -117,13 +107,51 @@ void TinyGameLibrary::moveObjects()
     int speed = 1;
 
     if (m_player != nullptr) {
-        int x = (m_player->x - speed) / m_tileWidth;
-        int y = (m_player->y - 0) / m_tileHeight;
-        TGL_Id id = m_levels.at(m_levelAt).layer0.at(y).at(x);
-        if (id == -1 || m_objectDefinitions.at(id).type != TGL_ObjectType::Floor)
-            m_player->x -= speed;
 
-        cout << float(m_player->x) / m_tileWidth << endl;
+        
+        for (const TGL_Object& object : m_levels.at(m_levelAt).sprites) {
+            if (m_objectDefinitions.at(object.definitionId).type == TGL_ObjectType::Player)
+                continue;
+            if (hitTest(*m_player, object)) cout << "X";
+        }
+
+        if (m_player->state == TGL_State::WALK) {
+            if (m_player->direction == TGL_Direction::LEFT) m_player->x -= speed;
+            if (m_player->direction == TGL_Direction::RIGHT) m_player->x += speed;
+            if (m_player->direction == TGL_Direction::UP) m_player->y -= speed;
+            if (m_player->direction == TGL_Direction::DOWN) m_player->y += speed;
+        }
+
+        /*float aLeft = (float) m_player->x / m_tileWidth;
+        float aRight = aLeft + (float) m_objectDefinitions.at(m_player->definitionId).spriteSheetCoord.width / m_tileWidth;
+        float aTop = (float) m_player->y / m_tileHeight;
+        float aBottom = aTop + (float) m_objectDefinitions.at(m_player->definitionId).spriteSheetCoord.height / m_tileHeight;
+
+        float bLeft = (int)(m_player->hDirection == TGL_Direction::LEFT ? aLeft - 1 : aLeft + 1);
+        float bRight = bLeft + 1.0f;
+        float bTop = (int)(m_player->vDirection == TGL_Direction::UP ? aTop - 1 : aTop + 1);
+        float bBottom = bTop + 1.0f;
+
+        TGL_Id id = m_levels.at(m_levelAt).layer0.at((int)bTop).at((int)bLeft);
+        if (id == -1 || m_objectDefinitions.at(id).type != TGL_ObjectType::Floor &&
+          !(aLeft <= bRight &&
+            bLeft <= aRight &&
+            aTop <= bBottom &&
+            bTop <= aBottom)) {
+            if (m_player->state == TGL_State::WALK) {
+                if (m_player->hDirection == TGL_Direction::LEFT) m_player->x -= speed;
+                if (m_player->hDirection == TGL_Direction::RIGHT) m_player->x += speed;
+                //if (m_player->vDirection == TGL_Direction::UP) m_player->y -= speed;
+                //else if (m_player->vDirection == TGL_Direction::DOWN) m_player->y += speed;
+            }
+        }*/
+
+        //int x = (m_player->x - speed) / m_tileWidth;
+        //int y = (m_player->y - 0) / m_tileHeight;
+        //TGL_Id id = m_levels.at(m_levelAt).layer0.at(y).at(x);
+        //if (id == -1 || m_objectDefinitions.at(id).type != TGL_ObjectType::Floor)
+        //    m_player->x -= speed;
+        //m_player->y += speed;
     }
 
     /*if (playerId != -1) {
@@ -157,7 +185,7 @@ void TinyGameLibrary::mainLoop()
         moveObjects();
         renderLevel();
         SDL_RenderPresent(m_renderer);
-        SDL_Delay(1000 / 10);
+        SDL_Delay(1000 / 30);
     }
 }
 
@@ -230,6 +258,13 @@ void TinyGameLibrary::renderLevel()
 
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
+
+            // debug
+            SDL_Rect rect = { j * m_tileWidth, i * m_tileHeight, m_tileWidth + 1, m_tileHeight + 1 };
+            SDL_SetRenderDrawColor(m_renderer, 255, 0, 0, 0);
+            SDL_RenderDrawRect(m_renderer, &rect);
+            SDL_SetRenderDrawColor(m_renderer, 0, 0, 0, 0);
+
             TGL_Id id = level.layer0.at(i).at(j);
             if (id == -1) continue;
             int x = j * m_tileWidth;// + (m_renderWidth - width * m_tileWidth) / 2;
@@ -239,7 +274,14 @@ void TinyGameLibrary::renderLevel()
         }
     }
 
-    for (const TGL_Object& object : level.layer1) {
+    for (const TGL_Object& object : level.sprites) {
+
+        // debug
+        SDL_Rect rect = { object.x, object.y, m_objectDefinitions.at(object.definitionId).spriteSheetCoord.width, m_objectDefinitions.at(object.definitionId).spriteSheetCoord.height };
+        SDL_SetRenderDrawColor(m_renderer, 0, 255, 0, 0);
+        SDL_RenderDrawRect(m_renderer, &rect);
+        SDL_SetRenderDrawColor(m_renderer, 0, 0, 0, 0);
+
         renderSprite(object.definitionId, object.x, object.y);
     }
 }
@@ -273,7 +315,7 @@ void TinyGameLibrary::setLevel(int levelAt)
     m_player = nullptr;
 
     TGL_Level& level = m_levels.at(m_levelAt);
-    for (TGL_Object& object : level.layer1) {
+    for (TGL_Object& object : level.sprites) {
         TGL_Id id = object.definitionId;
         TGL_ObjectDefinition& def = m_objectDefinitions.at(id);
         
