@@ -1,0 +1,218 @@
+<html>
+<body style="font-family:monospace">
+<h1>Rallagensåren (beta)</h1>
+<form>
+<table>
+    <tr>
+        <td valign="top">
+            <fieldset>
+                <legend>FORHÅNDSVISNING</legend>
+                <canvas id="canvas" width="400" height="400"/>
+            </fieldset>
+        </td>
+        <td>
+            <fieldset>
+                <legend>MØNSTER</legend>
+                <table>
+                    <tr>
+                        <td valign="top">
+                            bord I</br>
+                            <textarea id="pattern1" name="pattern1" cols="15" rows="26">
+      
+      
+x x x 
+x x x 
+x x x 
+ xox  
+ xox  
+ xox  
+xooox 
+xooox 
+xooox 
+oo oox
+oo oox
+oo oox
+o   oo
+o   oo
+o   oo
+  x  o
+  x  o
+  x  o
+ xxx  
+ xxx  
+ xxx  
+xxxxx 
+xxxxx 
+xxxxx </textarea>
+                        </td>
+                        <td valign="top">
+                            bord II</br>
+                            <textarea id="pattern2" name="pattern2" cols="12" rows="3">
+    
+    
+ x x</textarea>
+                        </td>
+                        <td valign="top">
+                            bord III</br>
+                            <textarea id="pattern3" name="pattern3" cols="15" rows="11">
+            
+            
+ooo     ooo 
+ ooo   ooo  
+  ooo ooo   
+   ooooo    
+    o o    o
+   ooooo    
+  ooo ooo   
+ ooo   ooo  
+ooo     ooo </textarea>
+                        </td>
+                        <td valign="top">
+                            bord IV</br>
+                            <textarea id="pattern4" name="pattern4" cols="15" rows="9">
+      
+      
+  x   
+ xxx  
+xxxxx 
+x   xx
+xxxxx 
+ xxx  
+  x   </textarea>
+                        </td>
+                        <td valign="top">
+                            bord V</br>
+                            <textarea id="pattern5" name="pattern5" cols="15" rows="9">
+x xo
+x xo
+x xo
+oxo 
+oxo 
+oxo 
+ o  
+ o  
+ o  </textarea>
+                        </td>
+                    </tr>
+                </table>
+            </fieldset>
+        </td>
+        <td valign="top">
+            <fieldset>
+                <legend>FARGER</legend>
+                x</br>
+                <input id="color1" name="color1" value="#AAAAAA"/>
+                <div id="colorprev1">&nbsp;</div>
+                </br>
+                (tomt)</br>
+                <input id="color2" name="color2" value="#202020"/>
+                <div id="colorprev2">&nbsp;</div>
+                </br>
+                o</br>
+                <input id="color3" name="color3" value="#EEEEEE"/>
+                <div id="colorprev3">&nbsp;</div>
+            </fieldset>
+            <fieldset>
+                <legend>REKKEFØLGE</legend>
+                <input id="order" name="order" value="524321"/>
+            </fieldset>
+            </br>
+            <input type="submit" value="Oppdater"/>
+        </td>
+    </tr>
+</table>
+</form>
+
+<script>
+
+function getParameterByName(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
+
+if (getParameterByName('pattern1') != null) document.getElementById('pattern1').value = getParameterByName('pattern1');
+if (getParameterByName('pattern2') != null) document.getElementById('pattern2').value = getParameterByName('pattern2');
+if (getParameterByName('pattern3') != null) document.getElementById('pattern3').value = getParameterByName('pattern3');
+if (getParameterByName('pattern4') != null) document.getElementById('pattern4').value = getParameterByName('pattern4');
+if (getParameterByName('pattern5') != null) document.getElementById('pattern5').value = getParameterByName('pattern5');
+if (getParameterByName('color1') != null) document.getElementById('color1').value = getParameterByName('color1');
+if (getParameterByName('color2') != null) document.getElementById('color2').value = getParameterByName('color2');
+if (getParameterByName('color3') != null) document.getElementById('color3').value = getParameterByName('color3');
+if (getParameterByName('order') != null) document.getElementById('order').value = getParameterByName('order');
+
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext('2d');
+
+var color1 = document.getElementById('color1').value;
+var color2 = document.getElementById('color2').value;
+var color3 = document.getElementById('color3').value;
+
+document.getElementById('colorprev1').style.background = color1;
+document.getElementById('colorprev2').style.background = color2;
+document.getElementById('colorprev3').style.background = color3;
+
+ctx.scale(3, 3);
+ctx.imageSmoothingEnabled = false;
+
+ctx.fillStyle = color1;
+ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+function createPattern(patternString)
+{
+    var patternStrings = patternString.split('\n');
+
+    var width = patternStrings[0].length;
+    var height = patternStrings.length;
+    
+    var canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    var context = canvas.getContext('2d');
+
+    for (var i = 0; i < height; i++) {
+        for (var j = 0; j < width; j++) {
+            var c = patternStrings[i][j];
+            
+            var color;
+            switch (c) {
+                case 'x':   color = color1;
+                            break;
+                case ' ':   color = color2;
+                            break;
+                case 'o':   color = color3;
+                            break;
+                    
+            }
+            
+            context.fillStyle = color;
+            context.fillRect(j, i, 1, 1);
+        }
+    }
+
+    return canvas;
+}
+
+var order = document.getElementById('order').value;
+for (var i = 0; i < order.length; i++) {
+    var patternId = order[i];
+
+    var patternString = document.getElementById('pattern' + patternId).value;
+    var pattern = createPattern(patternString);
+    
+    ctx.beginPath();
+    ctx.rect(0, 0, canvas.width, pattern.height);
+    ctx.fillStyle = ctx.createPattern(pattern, "repeat");
+    ctx.fill();
+
+    ctx.translate(0, pattern.height);
+}
+
+</script>
+
+</body>
+</html>
