@@ -6,11 +6,17 @@
     <tr>
         <td valign="top">
             <fieldset>
-                <legend>FORHÅNDSVISNING</legend>
-                <canvas id="canvas" width="400" height="400"/>
+                <legend>FORHÅNDSVISNING 2D</legend>
+                <canvas id="canvas2d" width="512" height="512"/>
             </fieldset>
         </td>
-        <td>
+        <td valign="top">
+            <fieldset>
+                <legend>FORHÅNDSVISNING 3D</legend>
+                <div id="canvas3d"/>
+            </fieldset>
+        </td>
+        <td valign="top">
             <fieldset>
                 <legend>MØNSTER</legend>
                 <table>
@@ -123,6 +129,8 @@ oxo
 </table>
 </form>
 
+<script src="three.min.js"></script>
+<script src="OBJLoader.js"></script>
 <script>
 
 function getParameterByName(name, url) {
@@ -145,8 +153,8 @@ if (getParameterByName('color2') != null) document.getElementById('color2').valu
 if (getParameterByName('color3') != null) document.getElementById('color3').value = getParameterByName('color3');
 if (getParameterByName('order') != null) document.getElementById('order').value = getParameterByName('order');
 
-var canvas = document.getElementById("canvas");
-var ctx = canvas.getContext('2d');
+var canvas2d = document.getElementById("canvas2d");
+var ctx = canvas2d.getContext('2d');
 
 var color1 = document.getElementById('color1').value;
 var color2 = document.getElementById('color2').value;
@@ -160,7 +168,7 @@ ctx.scale(3, 3);
 ctx.imageSmoothingEnabled = false;
 
 ctx.fillStyle = color1;
-ctx.fillRect(0, 0, canvas.width, canvas.height);
+ctx.fillRect(0, 0, canvas2d.width, canvas2d.height);
 
 function createPattern(patternString)
 {
@@ -205,11 +213,94 @@ for (var i = 0; i < order.length; i++) {
     var pattern = createPattern(patternString);
     
     ctx.beginPath();
-    ctx.rect(0, 0, canvas.width, pattern.height);
+    ctx.rect(0, 0, canvas2d.width, pattern.height);
     ctx.fillStyle = ctx.createPattern(pattern, "repeat");
     ctx.fill();
 
     ctx.translate(0, pattern.height);
+}
+
+
+{
+            var container;
+
+			var camera, scene, renderer;
+                var backgroundScene = new THREE.Scene();
+                var backgroundCamera = new THREE.Camera();
+
+			init();
+			animate();
+
+
+			function init() {
+
+				container = document.getElementById('canvas3d');
+
+				camera = new THREE.PerspectiveCamera( 45, 400 / 400, 1, 2000 );
+
+				scene = new THREE.Scene();
+                //scene.background = new THREE.Color(0xffffffff);
+
+				var directionalLight = new THREE.DirectionalLight( 0xffffff );
+				directionalLight.position.set( 0, 0.2, 1);
+				scene.add( directionalLight );
+
+				var texture = new THREE.Texture();
+
+                texture.image = canvas2d;
+			    texture.needsUpdate = true;
+
+				var loader = new THREE.OBJLoader();
+				loader.load( 'genser.obj', function ( object ) {
+					object.traverse( function ( child ) {
+						if ( child instanceof THREE.Mesh ) {
+							child.material.map = texture;
+						}
+					});
+					scene.add( object );
+				});
+
+                // Load the background texture
+                var bgtexture = THREE.ImageUtils.loadTexture( 'bag.png' );
+                var backgroundMesh = new THREE.Mesh(
+                    new THREE.PlaneGeometry(2, 2, 0),
+                    new THREE.MeshBasicMaterial({
+                        map: bgtexture
+                    }));
+                backgroundMesh.material.depthTest = false;
+                backgroundMesh.material.depthWrite = false;
+
+                backgroundScene.add(backgroundCamera );
+                backgroundScene.add(backgroundMesh );
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setSize( 400, 400 );
+				container.appendChild( renderer.domElement );
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+				render();
+
+			}
+
+			function render() {
+
+				camera.position.x = 2.2;
+				camera.position.y = 0;
+				camera.position.z = 5;
+
+				camera.lookAt( scene.position );
+
+                camera.position.x += 0.3;
+                camera.position.y += 0.3;
+
+                renderer.autoClear = false;
+                renderer.clear();
+                renderer.render(backgroundScene , backgroundCamera );
+				renderer.render( scene, camera );
+			}
 }
 
 </script>
