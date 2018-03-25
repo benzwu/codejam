@@ -1,74 +1,96 @@
-var wave;
-var env;
+var wave, env, delay;
 var time;
 var x, y;
 var prime = 2;
+
+var boxSize = 30;
+var inc = 20;
+var bpm = 120;
+var pitch = {
+	A: 220.00,
+	B: 246.94,
+	C: 261.63,
+	D: 293.66,
+	E: 329.63,
+	F: 349.23,
+	G: 392.00,
+	A2: 440,
+	A9: 2732,
+	B9: 3625,
+	C9: 3290,
+	D9: 2343
+};
 
 function setup() {
 	createCanvas(windowWidth, windowHeight);
 	x = windowWidth / 2;
 	y = windowHeight / 2;
 
-	env = new p5.Env();
-	env.setADSR(0.001, 0.05, 0, 0);
-	env.setRange(1, 0);
-
 	wave = new p5.Oscillator();
 	wave.setType('sine');
 	wave.start();
-	wave.freq(440);
-	wave.amp(env);
 
-	noStroke();
+	delay = new p5.Delay();
+	delay.process(wave);
+	delay.delayTime(0.2);
+	delay.feedback(0.2);
+
+	env = new p5.Env();
+	env.setADSR(0.01, 0.03, 0, 0);
+
 	colorMode(HSB);
 	background(240, 255, 255);
 }
 
 function draw() {
-    var size = 50;
-    var inc = 10;
-    var speed = 500;
-
-    var now = Math.floor(millis() / speed);
+	var now = Math.floor(bpm * millis() / 60000);
 	if (time != now) {
 		time = now;
-		env.play();
-		switch (prime % 4) {
-			case 0:
-				x -= size;
-	            wave.freq(200);
-				break;
+
+		bpm = min(bpm + 0.1, 10000);
+
+		colorMode(RGB);
+		var h = max(0, hue(get(x, y)) - inc);
+		colorMode(HSB);
+		stroke(h, 255, 255);
+		fill(h, 255, 255);
+		rect(x - boxSize / 2, y - boxSize / 2, boxSize, boxSize);
+		switch (prime % 5) {
 			case 1:
-				x += size;
-	            wave.freq(300);
+				x -= boxSize;
+				wave.freq(pitch[h > 150 ? 'A' : h > 10 ? 'B' : 'A9']);
 				break;
 			case 2:
-				y -= size;
-	            wave.freq(400);
+				x += boxSize;
+				wave.freq(pitch[h > 150 ? 'C' : h > 10 ? 'D' : 'B9']);
 				break;
 			case 3:
-				y += size;
-	            wave.freq(500);
+				y -= boxSize;
+				wave.freq(pitch[h > 150 ? 'E' : h > 10 ? 'F' : 'C9']);
+				break;
+			case 4:
+				y += boxSize;
+				wave.freq(pitch[h > 150 ? 'G' : h > 10 ? 'A2' : 'D9']);
 				break;
 		}
-	    colorMode(RGB);
-        var h = max(0, hue(get(x, y)) - inc);
-	    colorMode(HSB);
-		fill(h, 255, 255);
-		rect(x - size / 2, y - size / 2, size, size);
-        console.log(prime);
-        prime = nextPrime(prime);
+		env.play(wave);
+
+		prime = nextPrime(prime);
 	}
 }
 
-function nextPrime(n) {
-    return 2;
-    do {
-        for (var i = 2; i < n; i++) {
-            if (n % i == 0) {
-                n++;
-                break;
-            }
-        }
-    } while (true);
+function nextPrime(number) {
+	number++;
+	do {
+		var start = 2;
+		var found = true;
+		while (start <= sqrt(number)) {
+			if (number % start++ < 1) {
+				number++;
+				found = false;
+				break;
+			}
+		}
+		if (found) return number;
+	} while (true);
 }
