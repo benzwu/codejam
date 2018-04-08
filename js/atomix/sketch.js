@@ -1,10 +1,11 @@
 var player = {
 	x: 0,
 	y: 0,
-	toX: null,
-	toY: null,
+	toX: 0,
+	toY: 0,
 	speed: 0.2,
-	selectedAtom: null
+	selectedAtom: null,
+	isMovingAtom: false
 };
 
 var atoms = [];
@@ -22,7 +23,10 @@ var level = {
 		0, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2,
 		0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
 	width: 11,
-	height: 10
+	height: 10,
+	solution: [
+		4, 6, 5
+	]
 };
 
 var spriteSheet = {
@@ -41,41 +45,58 @@ function setup() {
 	createCanvas(windowWidth, windowHeight);
 
 	noSmooth();
-	frameRate(30);
+	frameRate(60);
 
 	spriteSheet.image = loadImage('spritesheet.png');
 
 	for (let i = 0; i < level.map.length; i++) {
 		let spriteId = level.map[i];
 		if (spriteId > 3) {
-			atoms[i] = spriteId;
+			let atom = {
+				x: i % level.width,
+				y: floor(i / level.width),
+				spriteId: spriteId
+			};
+			atoms.push(atom);
 		}
 	}
 
 	var modPlayer = new Modplayer();
 	modPlayer.load("fairlight-cracktro.mod");
-	modPlayer.setautostart(true);
 	modPlayer.setamigamodel("500");
+	modPlayer.setautostart(true);
 
 	background('black');
 }
 
 function draw() {
 	scale(4);
-	translate(1 * spriteSheet.gridSize, 1 * spriteSheet.gridSize);
+	translate(0 * spriteSheet.gridSize, 0 * spriteSheet.gridSize);
 	update();
 	drawMap();
 }
 
 function update() {
-	if (player.toX != null) {
-		player.x = player.x < player.toX ? min(player.toX, player.x + player.speed) : max(player.toX, player.x - player.speed);
-	}
-	if (player.toY != null) {
-		player.y = player.y < player.toY ? min(player.toY, player.y + player.speed) : max(player.toY, player.y - player.speed);
-	}
+	player.x = player.x < player.toX ? min(player.toX, player.x + player.speed) : max(player.toX, player.x - player.speed);
+	player.y = player.y < player.toY ? min(player.toY, player.y + player.speed) : max(player.toY, player.y - player.speed);
+
 	if (player.selectedAtom != null) {
-		; // TODO
+		let atom = atoms[player.selectedAtom];
+		level.map[floor(atom.y) * level.width + floor(atom.x)] = 1;
+		atom.x = player.x;
+		atom.y = player.y;
+		level.map[floor(atom.y) * level.width + floor(atom.x)] = atom.spriteId;
+	}
+
+	player.isMovingAtom = player.selectedAtom != null && (player.x != player.toX || player.y != player.toY);
+	if (!player.isMovingAtom) {
+		let levelDone = false;
+		for (i in atoms) {
+			let atom = atoms[i];
+			// 4 6 5
+			// TODO match solution and map;
+		}
+		if (levelDone) console.log("yay!");
 	}
 }
 
@@ -103,10 +124,9 @@ function drawMap() {
 
 	// atoms
 	for (i in atoms) {
-		let spriteId = atoms[i];
-		let x = (i % level.width) * gridSize;
-		let y = floor(i / level.width) * gridSize;
-		let spriteCoord = spriteSheet.coords[spriteId];
+		let x = atoms[i].x * gridSize;
+		let y = atoms[i].y * gridSize;
+		let spriteCoord = spriteSheet.coords[atoms[i].spriteId];
 		image(spriteSheet.image, x, y, spriteCoord[2], spriteCoord[3], spriteCoord[0], spriteCoord[1], spriteCoord[2], spriteCoord[3]);
 	}
 
@@ -126,34 +146,60 @@ function drawMap() {
 	}
 }
 
-function keyPressed() {
-	switch (keyCode) {
-		case LEFT_ARROW:
-			player.toX = max(0, player.toX - 1);
+function stepsUntilBlock(direction) {
+	let steps = 0;
+	let playerIdx = floor(player.y) * level.width + floor(player.x);
+	switch (direction) {
+		case "LEFT":
+			while (level.map[playerIdx - steps - 1] <= 1) steps++;
 			break;
-		case RIGHT_ARROW:
-			player.toX = min(level.width - 1, player.toX + 1);
+		case "RIGHT":
+			while (level.map[playerIdx + steps + 1] <= 1) steps++;
 			break;
-		case UP_ARROW:
-			player.toY = max(0, player.toY - 1);
+		case "UP":
+			while (level.map[playerIdx - (steps + 1) * level.width] <= 1) steps++;
 			break;
-		case DOWN_ARROW:
-			player.toY = min(level.height - 1, player.toY + 1);
-			break;
-		case 32: // SPACEBAR
-			selectedAtom();
+		case "DOWN":
+			while (level.map[playerIdx + (steps + 1) * level.width] <= 1) steps++;
 			break;
 	}
+	return steps;
 }
 
-function selectedAtom() {
-	if (player.selectedAtom == null) {
-		let idx = player.y * level.width + player.x;
-		if (atoms[idx] != null) {
-			player.selectedAtom = idx;
+function keyPressed() {
+	let steps = 1;
+	if (!player.isMovingAtom) {
+		switch (keyCode) {
+			case LEFT_ARROW:
+				if (player.selectedAtom != null) steps = stepsUntilBlock('LEFT');
+				player.toX = max(0, player.toX - steps);
+				break;
+			case RIGHT_ARROW:
+				if (player.selectedAtom != null) steps = stepsUntilBlock('RIGHT');
+				player.toX = min(level.width - 1, player.toX + steps);
+				break;
+			case UP_ARROW:
+				if (player.selectedAtom != null) steps = stepsUntilBlock('UP');
+				player.toY = max(0, player.toY - steps);
+				break;
+			case DOWN_ARROW:
+				if (player.selectedAtom != null) steps = stepsUntilBlock('DOWN');
+				player.toY = min(level.height - 1, player.toY + steps);
+				break;
+			case 32: // SPACEBAR
+				if (player.selectedAtom == null) {
+					for (i in atoms) {
+						let atom = atoms[i];
+						if (player.x == atom.x && player.y == atom.y) {
+							player.selectedAtom = i;
+							break;
+						}
+					}
+				} else {
+					player.selectedAtom = null;
+				}
+				break;
 		}
-	} else {
-		player.selectedAtom = null;
 	}
 }
 
@@ -161,7 +207,6 @@ function rotatingDashedEllipse(x, y, r) {
 	push();
 	translate(x, y);
 	rotate(millis() * 0.005);
-
 	let x1 = r;
 	let y1 = 0;
 	let detail = 16;
@@ -173,6 +218,5 @@ function rotatingDashedEllipse(x, y, r) {
 		x1 = x2;
 		y1 = y2;
 	}
-
 	pop();
 }
