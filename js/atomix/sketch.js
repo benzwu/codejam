@@ -1,13 +1,4 @@
-var player = {
-	x: 0,
-	y: 0,
-	toX: 0,
-	toY: 0,
-	speed: 0.2,
-	selectedAtom: null,
-	isMovingAtom: false
-};
-
+var player = {};
 var atoms = [];
 
 var level = {
@@ -24,13 +15,14 @@ var level = {
 		0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
 	width: 11,
 	height: 10,
-	solution: [
-		4, 6, 5
-	]
+	solution: {
+		map: [4, 6, 5],
+		w: 3,
+		h: 1
+	}
 };
 
 var spriteSheet = {
-	image: null,
 	coords: {
 		1: [0, 48, 16, 16],
 		2: [0, 0, 16, 16],
@@ -46,6 +38,11 @@ function setup() {
 
 	noSmooth();
 	frameRate(60);
+
+	player.x = 0;
+	player.y = 0;
+	player.toX = 0;
+	player.toY = 0;
 
 	spriteSheet.image = loadImage('spritesheet.png');
 
@@ -63,8 +60,8 @@ function setup() {
 
 	var modPlayer = new Modplayer();
 	modPlayer.load("fairlight-cracktro.mod");
-	modPlayer.setamigamodel("500");
-	modPlayer.setautostart(true);
+	//modPlayer.setamigamodel("500");
+	//modPlayer.setautostart(true);
 
 	background('black');
 }
@@ -77,8 +74,9 @@ function draw() {
 }
 
 function update() {
-	player.x = player.x < player.toX ? min(player.toX, player.x + player.speed) : max(player.toX, player.x - player.speed);
-	player.y = player.y < player.toY ? min(player.toY, player.y + player.speed) : max(player.toY, player.y - player.speed);
+	let speed = 0.2;
+	player.x = player.x < player.toX ? min(player.toX, player.x + speed) : max(player.toX, player.x - speed);
+	player.y = player.y < player.toY ? min(player.toY, player.y + speed) : max(player.toY, player.y - speed);
 
 	if (player.selectedAtom != null) {
 		let atom = atoms[player.selectedAtom];
@@ -90,14 +88,48 @@ function update() {
 
 	player.isMovingAtom = player.selectedAtom != null && (player.x != player.toX || player.y != player.toY);
 	if (!player.isMovingAtom) {
-		let levelDone = false;
-		for (i in atoms) {
-			let atom = atoms[i];
-			// 4 6 5
-			// TODO match solution and map;
+		if (isLevelDone()) {
+			console.log("yay!");
 		}
-		if (levelDone) console.log("yay!");
 	}
+}
+
+function isLevelDone() {
+	let v1, x1, y1;
+	for (let i = 0; i < level.solution.map.length; i++) {
+		v1 = level.solution.map[i];
+		if (v1 != 0) {
+			x1 = i % level.solution.w;
+			y1 = floor(i / level.solution.w);
+			break;
+		}
+	}
+
+	let v2, x2, y2;
+	for (let i = 0; i < level.map.length; i++) {
+		v2 = level.map[i];
+		if (v1 == v2) {
+			x2 = i % level.width;
+			y2 = floor(i / level.width);
+			break;
+		}
+	}
+
+	x2 -= x1;
+	y2 -= y1;
+	for (let i = 0; i < level.solution.map.length; i++) {
+		v1 = level.solution.map[i];
+		if (v1 != 0) {
+			x1 = i % level.solution.w;
+			y1 = floor(i / level.solution.w);
+			v2 = level.map[x1 + x2 + (y1 + y2) * level.width];
+			if (v1 != v2) {
+				return false;
+			}
+		}
+	}
+
+	return true;
 }
 
 function drawMap() {
