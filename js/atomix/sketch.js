@@ -2,6 +2,7 @@ var player = {};
 var atoms = [];
 
 var level = {
+	color: 'darkred',
 	map: [
 		2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0,
 		2, 1, 1, 1, 2, 0, 0, 0, 0, 0, 0,
@@ -62,15 +63,40 @@ function setup() {
 	modPlayer.load("fairlight-cracktro.mod");
 	//modPlayer.setamigamodel("500");
 	//modPlayer.setautostart(true);
-
-	background('black');
 }
 
 function draw() {
+	background('black');
 	scale(4);
-	translate(0 * spriteSheet.gridSize, 0 * spriteSheet.gridSize);
+	drawBackground();
+	textSize(20);
+	stroke('white');
+	fill('white');
+	textFont('Verdana');
+	text("0:" + (59 - second()), 10, 100);
+	translate(4 * spriteSheet.gridSize, 1 * spriteSheet.gridSize);
 	update();
 	drawMap();
+}
+
+function drawBackground() {
+	for (let i = 0; i < 2; i++) {
+		for (let j = 0; j < 20; j++) {
+			let a = j / (2 + i);
+			var l = 2;
+			var y = 8 * i + 2;
+			let x2 = (j - cos(a) - sin(a) + l) * spriteSheet.gridSize;
+			let x1 = (j + sin(a) + cos(a) - l) * spriteSheet.gridSize;
+			let y1 = (y - sin(a) - cos(a) + l) * spriteSheet.gridSize;
+			let y2 = (y + cos(a) + sin(a) - l) * spriteSheet.gridSize;
+			stroke(level.color);
+			strokeWeight(7);
+			line(x1, y1, x2, y2);
+			stroke(255, 100);
+			strokeWeight(2);
+			line(x1, y1 - 1, x2, y2 - 1);
+		}
+	}
 }
 
 function update() {
@@ -135,20 +161,17 @@ function isLevelDone() {
 function drawMap() {
 	let gridSize = spriteSheet.gridSize;
 
-	// background
-	noStroke();
-	fill(65, 48, 0);
-	rect(0, 0, level.width * gridSize, level.height * gridSize);
-
 	// walls
 	for (let i = 0; i < level.map.length; i++) {
 		let x = (i % level.width) * gridSize;
 		let y = floor(i / level.width) * gridSize;
 		let spriteId = level.map[i];
-		if (spriteId == 0) {
-			fill('black');
+		if (spriteId > 0) {
+			noStroke();
+			fill(70, 50, 0);
 			rect(x, y, gridSize, gridSize);
-		} else if (spriteId == 2 || spriteId == 3) {
+		}
+		if (spriteId == 2 || spriteId == 3) {
 			let spriteCoord = spriteSheet.coords[spriteId];
 			image(spriteSheet.image, x, y, spriteCoord[2], spriteCoord[3], spriteCoord[0], spriteCoord[1], spriteCoord[2], spriteCoord[3]);
 		}
