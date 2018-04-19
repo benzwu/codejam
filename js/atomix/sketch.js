@@ -445,7 +445,7 @@ function setup() {
         src: ["SleepArchiveTweakFM.mp3"],
         autoplay: true,
         loop: true,
-        volume: 1.0
+        volume: 0.5
     });
     music.play();
 }
